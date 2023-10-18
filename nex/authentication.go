@@ -16,7 +16,7 @@ func StartAuthenticationServer() {
 	globals.AuthenticationServer.SetPRUDPProtocolMinorVersion(2)
 	globals.AuthenticationServer.SetDefaultNEXVersion(nex.NewNEXVersion(3,10,0))
 	globals.AuthenticationServer.SetKerberosPassword(globals.KerberosPassword)
-	globals.AuthenticationServer.SetAccessKey("6f599f81")
+	globals.AuthenticationServer.SetAccessKey("f1b61c8e")
 
 	globals.AuthenticationServer.On("Data", func(packet *nex.PacketV1) {
 		request := packet.RMCRequest()

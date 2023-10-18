@@ -14,7 +14,7 @@ func StartSecureServer() {
 	globals.SecureServer.SetPRUDPProtocolMinorVersion(3)
 	globals.SecureServer.SetDefaultNEXVersion(nex.NewNEXVersion(3,10,0))
 	globals.SecureServer.SetKerberosPassword(globals.KerberosPassword)
-	globals.SecureServer.SetAccessKey("6f599f81")
+	globals.SecureServer.SetAccessKey("f1b61c8e")
 
 	globals.Timeline = make(map[uint32][]uint8)
 
