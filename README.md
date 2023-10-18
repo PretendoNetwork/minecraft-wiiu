@@ -1,4 +1,4 @@
-# Pokemon X/Y/OR/AS (Generation 6) (3DS) replacement server
+# Minecraft Wii U Edition (Wii U) replacement server
 Includes both the authentication and secure servers
 
 ## Compiling
