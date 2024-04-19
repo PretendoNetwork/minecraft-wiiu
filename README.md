@@ -44,7 +44,6 @@ All configuration options are handled via environment variables
 
 | Name                                    | Description                                                                                                            | Required                                      |
 |-----------------------------------------|------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------|
-| `PN_MINECRAFT_POSTGRES_URI`               | Fully qualified URI to your Postgres server (Example `postgres://username:password@localhost/minecraft?sslmode=disable`) | Yes                                           |
 | `PN_MINECRAFT_KERBEROS_PASSWORD`          | Password used as part of the internal server data in Kerberos tickets                                                  | No (Default password `password` will be used) |
 | `PN_MINECRAFT_AUTHENTICATION_SERVER_PORT` | Port for the authentication server                                                                                     | Yes                                           |
 | `PN_MINECRAFT_SECURE_SERVER_HOST`         | Host name for the secure server (should point to the same address as the authentication server)                        | Yes                                           |
