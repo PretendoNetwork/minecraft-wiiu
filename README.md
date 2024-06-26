@@ -42,12 +42,13 @@ All configuration options are handled via environment variables
 
 `.env` files are supported
 
-| Name                                    | Description                                                                                                            | Required                                      |
-|-----------------------------------------|------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------|
-| `PN_MINECRAFT_KERBEROS_PASSWORD`          | Password used as part of the internal server data in Kerberos tickets                                                  | No (Default password `password` will be used) |
-| `PN_MINECRAFT_AUTHENTICATION_SERVER_PORT` | Port for the authentication server                                                                                     | Yes                                           |
-| `PN_MINECRAFT_SECURE_SERVER_HOST`         | Host name for the secure server (should point to the same address as the authentication server)                        | Yes                                           |
-| `PN_MINECRAFT_SECURE_SERVER_PORT`         | Port for the secure server                                                                                             | Yes                                           |
-| `PN_MINECRAFT_ACCOUNT_GRPC_HOST`          | Host name for your account server gRPC service                                                                         | Yes                                           |
-| `PN_MINECRAFT_ACCOUNT_GRPC_PORT`          | Port for your account server gRPC service                                                                              | Yes                                           |
-| `PN_MINECRAFT_ACCOUNT_GRPC_API_KEY`       | API key for your account server gRPC service                                                                           | No (Assumed to be an open gRPC API)           |
+| Name                                      | Description                                                                                     | Required                                      |
+|-------------------------------------------|-------------------------------------------------------------------------------------------------|-----------------------------------------------|
+| `PN_MINECRAFT_KERBEROS_PASSWORD`          | Password used as part of the internal server data in Kerberos tickets                           | No (Default password `password` will be used) |
+| `PN_MINECRAFT_AUTHENTICATION_SERVER_PORT` | Port for the authentication server                                                              | Yes                                           |
+| `PN_MINECRAFT_SECURE_SERVER_HOST`         | Host name for the secure server (should point to the same address as the authentication server) | Yes                                           |
+| `PN_MINECRAFT_SECURE_SERVER_PORT`         | Port for the secure server                                                                      | Yes                                           |
+| `PN_MINECRAFT_ACCOUNT_GRPC_HOST`          | Host name for your account server gRPC service                                                  | Yes                                           |
+| `PN_MINECRAFT_ACCOUNT_GRPC_PORT`          | Port for your account server gRPC service                                                       | Yes                                           |
+| `PN_MINECRAFT_ACCOUNT_GRPC_API_KEY`       | API key for your account server gRPC service                                                    | No (Assumed to be an open gRPC API)           |
+| `PN_MINECRAFT_ALLOW_PUBLIC_MATCHMAKING`   | Set to "1" to enable public matchmaking (unsafe - game has 0 anticheat)                         | No (Assumed 0)                                |
