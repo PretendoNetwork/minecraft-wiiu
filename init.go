@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	pb "github.com/PretendoNetwork/grpc-go/account"
-	"github.com/PretendoNetwork/minecraft-wiiu/database"
 	"github.com/PretendoNetwork/minecraft-wiiu/globals"
 	"github.com/PretendoNetwork/plogger-go"
 	"github.com/joho/godotenv"
@@ -26,7 +25,6 @@ func init() {
 		globals.Logger.Warning("Error loading .env file")
 	}
 
-	postgresURI := os.Getenv("PN_MINECRAFT_POSTGRES_URI")
 	kerberosPassword := os.Getenv("PN_MINECRAFT_KERBEROS_PASSWORD")
 	authenticationServerPort := os.Getenv("PN_MINECRAFT_AUTHENTICATION_SERVER_PORT")
 	secureServerHost := os.Getenv("PN_MINECRAFT_SECURE_SERVER_HOST")
@@ -35,16 +33,13 @@ func init() {
 	accountGRPCPort := os.Getenv("PN_MINECRAFT_ACCOUNT_GRPC_PORT")
 	accountGRPCAPIKey := os.Getenv("PN_MINECRAFT_ACCOUNT_GRPC_API_KEY")
 
-	if strings.TrimSpace(postgresURI) == "" {
-		globals.Logger.Error("PN_MINECRAFT_POSTGRES_URI environment variable not set")
-		os.Exit(0)
-	}
-
 	if strings.TrimSpace(kerberosPassword) == "" {
 		globals.Logger.Warningf("PN_MINECRAFT_KERBEROS_PASSWORD environment variable not set. Using default password: %q", globals.KerberosPassword)
 	} else {
 		globals.KerberosPassword = kerberosPassword
 	}
+
+	globals.InitAccounts()
 
 	if strings.TrimSpace(authenticationServerPort) == "" {
 		globals.Logger.Error("PN_MINECRAFT_AUTHENTICATION_SERVER_PORT environment variable not set")
@@ -109,6 +104,4 @@ func init() {
 	globals.GRPCAccountCommonMetadata = metadata.Pairs(
 		"X-API-Key", accountGRPCAPIKey,
 	)
-
-	database.ConnectPostgres()
 }

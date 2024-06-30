@@ -23,8 +23,11 @@ go.work.sum
 
 # custom
 .vscode
+.idea
 .env
 build
 log
 *.pem
 *.key
+*.pcap
+*.pcapng
