@@ -4,11 +4,14 @@ import (
 	"github.com/PretendoNetwork/minecraft-wiiu/globals"
 	"github.com/PretendoNetwork/nex-go/v2"
 	"github.com/PretendoNetwork/nex-go/v2/types"
+	commonglobals "github.com/PretendoNetwork/nex-protocols-common-go/v2/globals"
+	"github.com/PretendoNetwork/nex-protocols-common-go/v2/match-making/database"
 	commonnattraversal "github.com/PretendoNetwork/nex-protocols-common-go/v2/nat-traversal"
 	commonsecure "github.com/PretendoNetwork/nex-protocols-common-go/v2/secure-connection"
 	nattraversal "github.com/PretendoNetwork/nex-protocols-go/v2/nat-traversal"
 	secure "github.com/PretendoNetwork/nex-protocols-go/v2/secure-connection"
 	"os"
+	"slices"
 
 	commonmatchmaking "github.com/PretendoNetwork/nex-protocols-common-go/v2/match-making"
 	commonmatchmakingext "github.com/PretendoNetwork/nex-protocols-common-go/v2/match-making-ext"
@@ -69,6 +72,63 @@ func stubBrowseMatchmakeSession(err error, packet nex.PacketInterface, callID ui
 	return rmcResponse, nil
 }
 
+func gameSpecificCanJoinMatchmakeSession(manager *commonglobals.MatchmakingManager, pid *types.PID, session *matchmakingtypes.MatchmakeSession) *nex.Error {
+	if !session.OpenParticipation.Value {
+		return nex.NewError(nex.ResultCodes.RendezVous.PermissionDenied, "Gathering is not open to new participants")
+	}
+
+	isPublic := false
+	attrib, err := session.Attributes.Get(0)
+	if err == nil {
+		// * I wish this was a joke. top 8 bits are GameMode
+		// * This is the only difference between a public and a Friends match
+		isPublic = (attrib.Value & 0xFFFFFF) == 0x30881
+	}
+
+	if isPublic && os.Getenv("PN_MINECRAFT_ALLOW_PUBLIC_MATCHMAKING") == "1" {
+		//globals.Logger.Info("Game is public")
+		return nil
+	}
+
+	host := session.OwnerPID
+	hostFriends := manager.GetUserFriendPIDs(host.LegacyValue())
+	if slices.Contains(hostFriends, pid.LegacyValue()) {
+		//globals.Logger.Info("User is friend of host")
+		return nil
+	}
+
+	isFriendsOfFriends := false
+	if len(session.ApplicationBuffer.Value) > 0xc3 {
+		isFriendsOfFriends = session.ApplicationBuffer.Value[0xc3] == 0x8F
+	}
+
+	if !isFriendsOfFriends {
+		return nex.NewError(nex.ResultCodes.RendezVous.NotFriend, "User is not a friend of host")
+	}
+
+	// * Get the participants of this gathering so we don't have to check all 100whatever of host's friends
+	_, _, participants, _, nerr := database.FindGatheringByID(manager, session.ID.Value)
+	if err != nil {
+		globals.Logger.Errorf("Can't find gathering for pariticpation check: %v", nerr)
+		return nerr
+	}
+
+	for _, friend := range hostFriends {
+		// * Make sure this friend is actually in-game
+		// * This cast feels bad
+		if slices.Contains(participants, uint64(friend)) {
+			// * Are you a friend of the host's friend?
+			friendsFriends := manager.GetUserFriendPIDs(friend)
+			if slices.Contains(friendsFriends, pid.LegacyValue()) {
+				//globals.Logger.Infof("User is friend of host's friend %v", friend)
+				return nil
+			}
+		}
+	}
+
+	return nex.NewError(nex.ResultCodes.RendezVous.NotFriend, "User is not a friend of host's friends")
+}
+
 func registerCommonSecureServerProtocols() {
 	secureProtocol := secure.NewProtocol()
 	globals.SecureEndpoint.RegisterServiceProtocol(secureProtocol)
@@ -94,6 +154,9 @@ func registerCommonSecureServerProtocols() {
 	globals.SecureEndpoint.RegisterServiceProtocol(matchmakeExtensionProtocol)
 	commonMatchmakeExtensionProtocol := commonmatchmakeextension.NewCommonProtocol(matchmakeExtensionProtocol)
 	commonMatchmakeExtensionProtocol.SetManager(globals.MatchmakingManager)
+
+	globals.MatchmakingManager.GetUserFriendPIDs = globals.GetUserFriendPIDs
+	globals.MatchmakingManager.CanJoinMatchmakeSession = gameSpecificCanJoinMatchmakeSession
 
 	commonMatchmakeExtensionProtocol.CleanupSearchMatchmakeSession = cleanupSearchMatchmakeSessionHandler
 	if os.Getenv("PN_MINECRAFT_ALLOW_PUBLIC_MATCHMAKING") != "1" {
