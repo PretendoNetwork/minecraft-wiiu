@@ -154,9 +154,9 @@ func registerCommonSecureServerProtocols() {
 	globals.SecureEndpoint.RegisterServiceProtocol(matchmakeExtensionProtocol)
 	commonMatchmakeExtensionProtocol := commonmatchmakeextension.NewCommonProtocol(matchmakeExtensionProtocol)
 	commonMatchmakeExtensionProtocol.SetManager(globals.MatchmakingManager)
+	commonMatchmakeExtensionProtocol.CanJoinMatchmakeSession = gameSpecificCanJoinMatchmakeSession
 
 	globals.MatchmakingManager.GetUserFriendPIDs = globals.GetUserFriendPIDs
-	globals.MatchmakingManager.CanJoinMatchmakeSession = gameSpecificCanJoinMatchmakeSession
 
 	commonMatchmakeExtensionProtocol.CleanupSearchMatchmakeSession = cleanupSearchMatchmakeSessionHandler
 	if os.Getenv("PN_MINECRAFT_ALLOW_PUBLIC_MATCHMAKING") != "1" {
