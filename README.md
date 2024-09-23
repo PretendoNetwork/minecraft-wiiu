@@ -37,6 +37,30 @@ $ make
 
 The server is now built to `build/minecraft` with the authentication server build string already set
 
+### Developing core libraries
+This server depends on [nex-protocols-common-go](https://github.com/PretendoNetwork/nex-protocols-common-go),
+[nex-protocols-go](https://github.com/PretendoNetwork/nex-protocols-go), and
+[nex-go](https://github.com/PretendoNetwork/nex-go) to implement the bulk of its functionality. Sometimes features or
+bugfixes depend on unreleased development versions of these libraries; or changes have to be made at the library level
+to work on this server.
+
+To use these unreleased libraries, add a `go.work` file with something like the following content:
+```go
+go 1.21
+
+use (
+	.
+)
+
+replace (
+	github.com/PretendoNetwork/nex-go/v2 => ../nex-go
+	github.com/PretendoNetwork/nex-protocols-go/v2 => ../nex-protocols-go
+	github.com/PretendoNetwork/nex-protocols-common-go/v2 => ../nex-protocols-common-go
+)
+```
+
+The build will then build these libraries out of the folders specified instead of pulling the released versions.
+
 ## Configuration
 All configuration options are handled via environment variables
 
