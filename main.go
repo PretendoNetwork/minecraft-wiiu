@@ -25,7 +25,7 @@ func main() {
 func selfTest() {
 	globals.Logger.Info("Self-testing...")
 	var errors = 0
-	var seenPids map[uint64]struct{}
+	seenPids := make(map[uint64]struct{})
 	// apparently we hold a lock all the way thru this
 	globals.SecureEndpoint.Connections.Each(func(key string, pc *nex2.PRUDPConnection) bool {
 		if pc.PID() == nil || pc.PID().Value() == 0 {
@@ -51,7 +51,7 @@ func selfTest() {
 		var found = false
 		globals.SecureServer.Connections.Each(func(key string, sc *nex2.SocketConnection) bool {
 			return sc.Connections.Each(func(key uint8, pc2 *nex2.PRUDPConnection) bool {
-				if pc2 == pc {
+				if pc2.ID == pc.ID {
 					if found {
 						globals.Logger.Warningf("Duplicate SocketConnection: %v %#v", key, pc)
 						errors++
@@ -68,7 +68,7 @@ func selfTest() {
 		}
 		return false
 	})
-	globals.Logger.Infof("Self-test finished with %v errors", errors)
+	globals.Logger.Infof("Self-test finished with %v errors - %v connections", errors, globals.SecureEndpoint.Connections.Size())
 }
 func startSelfTesting() {
 	for range time.Tick(10 * time.Second) {
