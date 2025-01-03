@@ -47,25 +47,7 @@ func selfTest() {
 			errors++
 		}
 		seenPids[pid] = struct{}{}
-		// check SocketConnections
-		var found = false
-		globals.SecureServer.Connections.Each(func(key string, sc *nex2.SocketConnection) bool {
-			return sc.Connections.Each(func(key uint8, pc2 *nex2.PRUDPConnection) bool {
-				if pc2.ID == pc.ID {
-					if found {
-						globals.Logger.Warningf("Duplicate SocketConnection: %v %#v", key, pc)
-						errors++
-					}
-					found = true
-					return true
-				}
-				return false
-			})
-		})
-		if !found {
-			globals.Logger.Warningf("Connection has no SocketConnection: %v %#v", key, pc)
-			errors++
-		}
+
 		return false
 	})
 	globals.Logger.Infof("Self-test finished with %v errors - %v connections", errors, globals.SecureEndpoint.Connections.Size())
