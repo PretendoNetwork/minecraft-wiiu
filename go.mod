@@ -11,7 +11,7 @@ require (
 	github.com/PretendoNetwork/nex-protocols-go/v2 v2.0.4
 	github.com/PretendoNetwork/plogger-go v1.0.4
 	github.com/joho/godotenv v1.5.1
-	google.golang.org/grpc v1.69.2
+	google.golang.org/grpc v1.63.2
 )
 
 require (
@@ -33,6 +33,6 @@ require (
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/term v0.27.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20241230172942-26aa7a208def // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250102185135-69823020774d // indirect
 	google.golang.org/protobuf v1.36.1 // indirect
 )
