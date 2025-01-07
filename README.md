@@ -75,4 +75,7 @@ All configuration options are handled via environment variables
 | `PN_MINECRAFT_ACCOUNT_GRPC_HOST`          | Host name for your account server gRPC service                                                  | Yes                                           |
 | `PN_MINECRAFT_ACCOUNT_GRPC_PORT`          | Port for your account server gRPC service                                                       | Yes                                           |
 | `PN_MINECRAFT_ACCOUNT_GRPC_API_KEY`       | API key for your account server gRPC service                                                    | No (Assumed to be an open gRPC API)           |
-| `PN_MINECRAFT_ALLOW_PUBLIC_MATCHMAKING`   | Set to "1" to enable public matchmaking (unsafe - game has 0 anticheat)                         | No (Assumed 0)                                |
+| `PN_MINECRAFT_FRIENDS_GRPC_HOST`          | Host name for Friends gRPC service (used for friends matchmaking)                               | Yes                                           |
+| `PN_MINECRAFT_FRIENDS_GRPC_PORT`          | Port for Friends gRPC service                                                                   | Yes                                           |
+| `PN_MINECRAFT_FRIENDS_GRPC_API_KEY`       | API key for Friends gRPC service                                                                | No (Assumed to be an open gRPC API)           |
+| `PN_MINECRAFT_ALLOW_PUBLIC_MATCHMAKING`   | Set to "1" to enable public matchmaking (unsafe - game has 0 anti-cheat)                        | No (Assumed 0)                                |
