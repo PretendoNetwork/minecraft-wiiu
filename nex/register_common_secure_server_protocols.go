@@ -31,13 +31,13 @@ func cleanupSearchMatchmakeSessionHandler(matchmakeSession *matchmakingtypes.Mat
 	globals.Logger.Info(matchmakeSession.String())
 }
 
-func CreateReportDBRecord(_ *types.PID, _ *types.PrimitiveU32, _ *types.QBuffer) error {
+func CreateReportDBRecord(_ types.PID, _ types.UInt32, _ types.QBuffer) error {
 	return nil
 }
 
 // * Minecraft WiiU edition isn't always safe to play on public matches. To mitigate this, just claim there are no
 // * public matches.
-func stubBrowseMatchmakeSession(err error, packet nex.PacketInterface, callID uint32, _ *matchmakingtypes.MatchmakeSessionSearchCriteria, _ *types.ResultRange) (*nex.RMCMessage, *nex.Error) {
+func stubBrowseMatchmakeSession(err error, packet nex.PacketInterface, callID uint32, _ matchmakingtypes.MatchmakeSessionSearchCriteria, _ types.ResultRange) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		globals.Logger.Error(err.Error())
 		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, "change_error")
@@ -46,8 +46,7 @@ func stubBrowseMatchmakeSession(err error, packet nex.PacketInterface, callID ui
 	connection := packet.Sender().(*nex.PRUDPConnection)
 	endpoint := connection.Endpoint().(*nex.PRUDPEndPoint)
 
-	lstGathering := types.NewList[*types.AnyDataHolder]()
-	lstGathering.Type = types.NewAnyDataHolder()
+	lstGathering := types.NewList[types.DataHolder]()
 
 	// * Don't include any sessions!
 	//for _, session := range sessions {
@@ -72,18 +71,16 @@ func stubBrowseMatchmakeSession(err error, packet nex.PacketInterface, callID ui
 	return rmcResponse, nil
 }
 
-func gameSpecificCanJoinMatchmakeSession(manager *commonglobals.MatchmakingManager, pid *types.PID, session *matchmakingtypes.MatchmakeSession) *nex.Error {
-	if !session.OpenParticipation.Value {
+func gameSpecificCanJoinMatchmakeSession(manager *commonglobals.MatchmakingManager, pid types.PID, session matchmakingtypes.MatchmakeSession) *nex.Error {
+	if !session.OpenParticipation {
 		return nex.NewError(nex.ResultCodes.RendezVous.PermissionDenied, "Gathering is not open to new participants")
 	}
 
 	isPublic := false
-	attrib, err := session.Attributes.Get(0)
-	if err == nil {
-		// * I wish this was a joke. top 8 bits are GameMode
-		// * This is the only difference between a public and a Friends match
-		isPublic = (attrib.Value & 0xFFFFFF) == 0x30881
-	}
+	attrib := session.Attributes[0]
+	// * I wish this was a joke. top 8 bits are GameMode
+	// * This is the only difference between a public and a Friends match
+	isPublic = (attrib & 0xFFFFFF) == 0x30881
 
 	if isPublic && os.Getenv("PN_MINECRAFT_ALLOW_PUBLIC_MATCHMAKING") == "1" {
 		//globals.Logger.Info("Game is public")
@@ -91,15 +88,15 @@ func gameSpecificCanJoinMatchmakeSession(manager *commonglobals.MatchmakingManag
 	}
 
 	host := session.OwnerPID
-	hostFriends := manager.GetUserFriendPIDs(host.LegacyValue())
-	if slices.Contains(hostFriends, pid.LegacyValue()) {
+	hostFriends := manager.GetUserFriendPIDs(uint32(host))
+	if slices.Contains(hostFriends, uint32(pid)) {
 		//globals.Logger.Info("User is friend of host")
 		return nil
 	}
 
 	isFriendsOfFriends := false
-	if len(session.ApplicationBuffer.Value) > 0xc3 {
-		isFriendsOfFriends = session.ApplicationBuffer.Value[0xc3] == 0x8F
+	if len(session.ApplicationBuffer) > 0xc3 {
+		isFriendsOfFriends = session.ApplicationBuffer[0xc3] == 0x8F
 	}
 
 	if !isFriendsOfFriends {
@@ -107,8 +104,8 @@ func gameSpecificCanJoinMatchmakeSession(manager *commonglobals.MatchmakingManag
 	}
 
 	// * Get the participants of this gathering so we don't have to check all 100whatever of host's friends
-	_, _, participants, _, nerr := database.FindGatheringByID(manager, session.ID.Value)
-	if err != nil {
+	_, _, participants, _, nerr := database.FindGatheringByID(manager, uint32(session.ID))
+	if nerr != nil {
 		globals.Logger.Errorf("Can't find gathering for pariticpation check: %v", nerr)
 		return nerr
 	}
@@ -119,7 +116,7 @@ func gameSpecificCanJoinMatchmakeSession(manager *commonglobals.MatchmakingManag
 		if slices.Contains(participants, uint64(friend)) {
 			// * Are you a friend of the host's friend?
 			friendsFriends := manager.GetUserFriendPIDs(friend)
-			if slices.Contains(friendsFriends, pid.LegacyValue()) {
+			if slices.Contains(friendsFriends, uint32(pid)) {
 				//globals.Logger.Infof("User is friend of host's friend %v", friend)
 				return nil
 			}
