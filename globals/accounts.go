@@ -10,6 +10,11 @@ import (
 var AuthenticationServerAccount *nex.Account
 var SecureServerAccount *nex.Account
 
+func InitAccounts() {
+	AuthenticationServerAccount = nex.NewAccount(types.NewPID(1), "Quazal Authentication", KerberosPassword, false)
+	SecureServerAccount = nex.NewAccount(types.NewPID(2), "Quazal Rendez-Vous", KerberosPassword, false)
+}
+
 func AccountDetailsByPID(pid types.PID) (*nex.Account, *nex.Error) {
 	if pid.Equals(AuthenticationServerAccount.PID) {
 		return AuthenticationServerAccount, nil
