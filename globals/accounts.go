@@ -1,18 +1,18 @@
 package globals
 
 import (
+	"strconv"
+
 	"github.com/PretendoNetwork/nex-go/v2"
 	"github.com/PretendoNetwork/nex-go/v2/types"
-	"strconv"
 )
 
 var AuthenticationServerAccount *nex.Account
-
 var SecureServerAccount *nex.Account
 
 func InitAccounts() {
-	AuthenticationServerAccount = nex.NewAccount(types.NewPID(1), "Quazal Authentication", KerberosPassword)
-	SecureServerAccount = nex.NewAccount(types.NewPID(2), "Quazal Rendez-Vous", KerberosPassword)
+	AuthenticationServerAccount = nex.NewAccount(types.NewPID(1), "Quazal Authentication", KerberosPassword, false)
+	SecureServerAccount = nex.NewAccount(types.NewPID(2), "Quazal Rendez-Vous", KerberosPassword, false)
 }
 
 func AccountDetailsByPID(pid types.PID) (*nex.Account, *nex.Error) {
@@ -29,7 +29,7 @@ func AccountDetailsByPID(pid types.PID) (*nex.Account, *nex.Error) {
 		return nil, nex.NewError(errorCode, "Failed to get password from PID")
 	}
 
-	account := nex.NewAccount(pid, strconv.Itoa(int(pid)), password)
+	account := nex.NewAccount(pid, strconv.Itoa(int(pid)), password, false)
 
 	return account, nil
 }
@@ -45,7 +45,6 @@ func AccountDetailsByUsername(username string) (*nex.Account, *nex.Error) {
 
 	pidInt, err := strconv.Atoi(username)
 	if err != nil {
-		Logger.Error(err.Error())
 		return nil, nex.NewError(nex.ResultCodes.RendezVous.InvalidUsername, "Invalid username")
 	}
 
@@ -53,11 +52,10 @@ func AccountDetailsByUsername(username string) (*nex.Account, *nex.Error) {
 
 	password, errorCode := PasswordFromPID(pid)
 	if errorCode != 0 {
-		Logger.Errorf("Password err: %v", errorCode)
 		return nil, nex.NewError(errorCode, "Failed to get password from PID")
 	}
 
-	account := nex.NewAccount(pid, username, password)
+	account := nex.NewAccount(pid, username, password, false)
 
 	return account, nil
 }

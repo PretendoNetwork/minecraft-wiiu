@@ -24,8 +24,6 @@ func StartSecureServer() {
 	globals.SecureServer.LibraryVersions.SetDefault(nex.NewLibraryVersion(3, 10, 0))
 	globals.SecureServer.AccessKey = "f1b61c8e"
 
-	globals.Timeline = make(map[uint32][]uint8)
-
 	globals.SecureEndpoint.OnData(func(packet nex.PacketInterface) {
 		request := packet.RMCMessage()
 
